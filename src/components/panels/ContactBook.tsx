@@ -25,9 +25,10 @@ export const ContactBook: React.FC<ContactBookProps> = ({ onGoToEnd, prefillServ
 
     setIsSubmitting(true);
 
-    const accessKey = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY;
+    const accessKey =
+      import.meta.env.VITE_WEB3FORMS_ACCESS_KEY || 'ed8f7c03-05ba-4a38-95d0-35d8ec02378b';
 
-    if (accessKey && accessKey !== 'YOUR_ACCESS_KEY_HERE') {
+    if (accessKey) {
       try {
         const res = await fetch('https://api.web3forms.com/submit', {
           method: 'POST',
