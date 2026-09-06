@@ -1,6 +1,7 @@
 import React from 'react';
 import { RotateCcw, Compass, Copy, Check, ExternalLink } from 'lucide-react';
 import { soundManager } from '../../utils/soundEffects';
+import { contactData } from '../../data/socials';
 
 interface EndScreenProps {
   onRespawn: () => void;
@@ -11,7 +12,7 @@ export const EndScreen: React.FC<EndScreenProps> = ({ onRespawn, onExploreAgain 
   const [copied, setCopied] = React.useState(false);
 
   const handleCopyEmail = () => {
-    navigator.clipboard.writeText("balaaadhityaa.k2024lcsbs@sece.ac.in");
+    navigator.clipboard.writeText(contactData.email);
     soundManager.playPop();
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
