@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { contactData } from '../../data/socials';
-import { Mail, Phone, MapPin, Send, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, CheckCircle2, ArrowRight, Copy, Check } from 'lucide-react';
 import { soundManager } from '../../utils/soundEffects';
 import { GithubIcon, LinkedinIcon } from '../ui/BrandIcons';
 
@@ -15,14 +15,76 @@ export const ContactBook: React.FC<ContactBookProps> = ({ onGoToEnd, prefillServ
   const [message, setMessage] = useState(
     prefillService ? `Hi Bala, I am interested in your ${prefillService} trade.` : ''
   );
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [copied, setCopied] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !email.trim() || !message.trim()) return;
 
-    soundManager.playXpChime();
-    setIsSubmitted(true);
+    setIsSubmitting(true);
+
+    const accessKey = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY;
+
+    if (accessKey && accessKey !== 'YOUR_ACCESS_KEY_HERE') {
+      try {
+        const res = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify({
+            access_key: accessKey,
+            name,
+            email,
+            message,
+            subject: `[Portfolio Inquiry] from ${name}`,
+            from_name: name,
+          }),
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          soundManager.playLevelUp();
+          setIsSubmitted(true);
+        } else {
+          // Fallback to mailto if API returned error
+          triggerMailto();
+          setIsSubmitted(true);
+        }
+      } catch (err) {
+        console.error('Web3Forms dispatch error:', err);
+        // Fallback to mailto
+        triggerMailto();
+        setIsSubmitted(true);
+      } finally {
+        setIsSubmitting(false);
+      }
+    } else {
+      // Default: Direct client-side mailto dispatch
+      triggerMailto();
+      soundManager.playLevelUp();
+      setIsSubmitted(true);
+      setIsSubmitting(false);
+    }
+  };
+
+  const triggerMailto = () => {
+    const subject = encodeURIComponent(`[Portfolio Dispatch] Inquiry from ${name}`);
+    const body = encodeURIComponent(
+      `Hello Bala,\n\nSender Name: ${name}\nSender Email: ${email}\n\nMessage:\n${message}\n\n--\nSent via Minecraft Developer Portfolio`
+    );
+    window.open(`mailto:${contactData.email}?subject=${subject}&body=${body}`, '_blank');
+  };
+
+  const handleCopy = () => {
+    const textToCopy = `Sender: ${name} (${email})\n\nMessage:\n${message}`;
+    navigator.clipboard.writeText(textToCopy);
+    setCopied(true);
+    soundManager.playPop();
+    setTimeout(() => setCopied(false), 2500);
   };
 
   return (
@@ -159,28 +221,63 @@ export const ContactBook: React.FC<ContactBookProps> = ({ onGoToEnd, prefillServ
             </div>
 
             {isSubmitted ? (
-              <div className="py-10 text-center space-y-3">
-                <div className="w-12 h-12 bg-emerald-950 border-2 border-emerald-400 rounded-full flex items-center justify-center mx-auto shadow-lg">
+              <div className="py-8 text-center space-y-3.5">
+                <div className="w-12 h-12 bg-emerald-950 border-2 border-emerald-400 rounded-full flex items-center justify-center mx-auto shadow-lg animate-bounce">
                   <CheckCircle2 className="w-7 h-7 text-emerald-400" />
                 </div>
-                <h4 className="font-pixel text-base text-white">
-                  Message sent successfully!
-                </h4>
-                <p className="text-xs text-zinc-300 font-sans-clean max-w-xs mx-auto">
-                  Thank you for reaching out. I've received your dispatch and will respond promptly.
-                </p>
-                <button
-                  onClick={() => {
-                    soundManager.playPop();
-                    setIsSubmitted(false);
-                    setName('');
-                    setEmail('');
-                    setMessage('');
-                  }}
-                  className="mc-button px-4 py-1.5 text-xs cursor-pointer mt-4"
-                >
-                  Send another message
-                </button>
+                <div>
+                  <h4 className="font-pixel text-base text-white">
+                    Dispatch Sent Successfully!
+                  </h4>
+                  <p className="text-xs text-zinc-300 font-sans-clean max-w-xs mx-auto mt-1">
+                    Thank you for reaching out, <span className="text-emerald-300 font-semibold">{name}</span>. Your inquiry has been dispatched to Bala.
+                  </p>
+                </div>
+
+                {/* Helpful Action Buttons */}
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-2 pt-2">
+                  <button
+                    onClick={handleCopy}
+                    className="mc-button px-3.5 py-1.5 text-[11px] flex items-center space-x-1.5 cursor-pointer w-full sm:w-auto justify-center"
+                    title="Copy message contents to clipboard"
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-emerald-400" />
+                        <span className="text-emerald-300">Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5 text-zinc-300" />
+                        <span>Copy Message</span>
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    onClick={triggerMailto}
+                    className="mc-button px-3.5 py-1.5 text-[11px] flex items-center space-x-1.5 cursor-pointer w-full sm:w-auto justify-center"
+                    title="Open in your default email app"
+                  >
+                    <Mail className="w-3.5 h-3.5 text-cyan-300" />
+                    <span>Open in Email App</span>
+                  </button>
+                </div>
+
+                <div className="pt-2">
+                  <button
+                    onClick={() => {
+                      soundManager.playPop();
+                      setIsSubmitted(false);
+                      setName('');
+                      setEmail('');
+                      setMessage('');
+                    }}
+                    className="text-xs text-zinc-400 hover:text-white underline cursor-pointer font-sans-clean"
+                  >
+                    Send another message
+                  </button>
+                </div>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-3.5">
@@ -228,10 +325,17 @@ export const ContactBook: React.FC<ContactBookProps> = ({ onGoToEnd, prefillServ
 
                 <button
                   type="submit"
-                  className="mc-button mc-button-green w-full py-2.5 text-xs flex items-center justify-center space-x-2 cursor-pointer shadow-lg mt-2"
+                  disabled={isSubmitting}
+                  className="mc-button mc-button-green w-full py-2.5 text-xs flex items-center justify-center space-x-2 cursor-pointer shadow-lg mt-2 disabled:opacity-50"
                 >
-                  <span>SEND DISPATCH</span>
-                  <Send className="w-3.5 h-3.5" />
+                  {isSubmitting ? (
+                    <span>DISPATCHING PIGEON...</span>
+                  ) : (
+                    <>
+                      <span>SEND DISPATCH</span>
+                      <Send className="w-3.5 h-3.5" />
+                    </>
+                  )}
                 </button>
               </form>
             )}
