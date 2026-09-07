@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import type { VillagerTradeItem } from '../../data/services';
 import { servicesData, builderStats } from '../../data/services';
 import { PixelIcon } from '../ui/PixelIcon';
@@ -127,9 +128,15 @@ export const VillagerTrades: React.FC<VillagerTradesProps> = ({ onMakeOffer }) =
       </div>
 
       {/* Trade Inspection Modal */}
-      {selectedTrade && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="mc-panel max-w-md w-full p-5 rounded border-2 border-emerald-400 relative">
+      {selectedTrade && createPortal(
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+          onClick={() => setSelectedTrade(null)}
+        >
+          <div 
+            className="mc-panel max-w-md w-full p-5 rounded border-2 border-emerald-400 relative"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               onClick={() => setSelectedTrade(null)}
               className="absolute top-4 right-4 mc-button px-2 py-1 text-xs cursor-pointer"
@@ -178,7 +185,8 @@ export const VillagerTrades: React.FC<VillagerTradesProps> = ({ onMakeOffer }) =
               <Check className="w-4 h-4" />
             </button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

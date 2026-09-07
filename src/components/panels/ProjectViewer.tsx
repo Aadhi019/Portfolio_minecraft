@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import type { ProjectItem } from '../../data/projects';
 import { X, ExternalLink, Cpu, Activity, Check, ArrowRight, ShieldAlert, Wifi, Smartphone, BellRing, Database, MessageSquare, Users, Calendar } from 'lucide-react';
 import { soundManager } from '../../utils/soundEffects';
@@ -40,11 +41,18 @@ export const ProjectViewer: React.FC<ProjectViewerProps> = ({ project, onClose }
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md overflow-y-auto">
+  return createPortal(
+    <div 
+      className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md overflow-y-auto"
+      onClick={() => {
+        soundManager.playChestClose();
+        onClose();
+      }}
+    >
       <div 
-        className="mc-panel w-full max-w-4xl bg-zinc-950/95 border-3 border-zinc-700 rounded p-4 sm:p-7 shadow-2xl relative max-h-[92vh] overflow-y-auto"
+        className="mc-panel w-full max-w-4xl bg-zinc-950/95 border-3 border-zinc-700 rounded p-4 sm:p-7 shadow-2xl relative max-h-[88vh] overflow-y-auto my-auto"
         style={{ borderColor: project.accentColor }}
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
@@ -193,6 +201,7 @@ export const ProjectViewer: React.FC<ProjectViewerProps> = ({ project, onClose }
           </span>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

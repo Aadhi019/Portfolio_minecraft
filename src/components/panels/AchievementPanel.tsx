@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import type { AchievementItem } from '../../data/achievements';
 import { achievementsData } from '../../data/achievements';
 import type { CertificationItem } from '../../data/certifications';
@@ -217,9 +218,15 @@ export const AchievementPanel: React.FC<AchievementPanelProps> = ({ onSendMessag
       )}
 
       {/* Certificate Modal */}
-      {selectedCert && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="mc-panel max-w-lg w-full p-6 relative rounded border-2 border-cyan-400">
+      {selectedCert && createPortal(
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+          onClick={() => setSelectedCert(null)}
+        >
+          <div 
+            className="mc-panel max-w-lg w-full p-6 relative rounded border-2 border-cyan-400"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               onClick={() => setSelectedCert(null)}
               className="absolute top-4 right-4 mc-button px-2 py-1 text-xs cursor-pointer"
@@ -259,7 +266,8 @@ export const AchievementPanel: React.FC<AchievementPanelProps> = ({ onSendMessag
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

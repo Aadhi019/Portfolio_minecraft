@@ -19,8 +19,8 @@ export const RecruiterModal: React.FC<RecruiterModalProps> = ({ onClose, onNavig
   const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'PROJECTS' | 'SKILLS' | 'EDUCATION' | 'ACHIEVEMENTS'>('OVERVIEW');
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md overflow-y-auto">
-      <div className="bg-zinc-900 border-2 border-zinc-700 rounded-lg max-w-4xl w-full max-h-[92vh] overflow-y-auto shadow-2xl flex flex-col">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md overflow-y-auto">
+      <div className="bg-zinc-900 border-2 border-zinc-700 rounded-lg max-w-4xl w-full max-h-[88vh] overflow-y-auto shadow-2xl flex flex-col">
         {/* Header */}
         <div className="p-5 sm:p-6 border-b border-zinc-800 flex items-start justify-between bg-zinc-950/70">
           <div>
