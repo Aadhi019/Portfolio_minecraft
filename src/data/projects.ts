@@ -82,7 +82,7 @@ export const projectsData: ProjectItem[] = [
       "Budget Controls: Configurable threshold alerts before committing decisions",
       "Travel Filters: Filter by duration, budget tiers, safety thresholds, and pacing"
     ],
-    githubUrl: "https://github.com/balaaadhityaa",
+    githubUrl: "https://github.com/Aadhi019/LifeOS",
     demoUrl: "#",
     accentColor: "#a855f7",
     chestIcon: "BookOpen"
@@ -149,7 +149,7 @@ export const projectsData: ProjectItem[] = [
       "Emergency Alerting: Automated caregiver notifications with audible distress prompts",
       "Wokwi Hardware Simulation: Complete virtualized circuit testing and firmware benchmarking"
     ],
-    githubUrl: "https://github.com/balaaadhityaa",
+    githubUrl: "https://github.com/Aadhi019/FallGuard",
     demoUrl: "#",
     accentColor: "#06b6d4",
     chestIcon: "Activity"
